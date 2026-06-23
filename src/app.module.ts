@@ -8,6 +8,7 @@ import databaseConfig from './config/database.config';
 import mailConfig from './config/mail.config';
 import redisConfig from './config/redis.config';
 import storageConfig from './config/storage.config';
+import aiConfig from './config/ai.config';
 import { DatabaseModule } from './database/database.module';
 import { HealthController } from './health/health.controller';
 import { ProfileModule } from './profile/profile.module';
@@ -20,12 +21,16 @@ import { WorkoutsModule } from './workouts/workouts.module';
 import { WorkoutLogsModule } from './workout-logs/workout-logs.module';
 import { MealsModule } from './meals/meals.module';
 import { WaterLogsModule } from './water-logs/water-logs.module';
+import { AchievementsModule } from './achievements/achievements.module';
+import { FitnessScoresModule } from './fitness-scores/fitness-scores.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { AiWorkoutModule } from './ai-workout/ai-workout.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [databaseConfig, redisConfig, authConfig, mailConfig, storageConfig],
+      load: [databaseConfig, redisConfig, authConfig, mailConfig, storageConfig, aiConfig],
     }),
     DatabaseModule,
     RedisModule,
@@ -39,6 +44,10 @@ import { WaterLogsModule } from './water-logs/water-logs.module';
     WorkoutLogsModule,
     MealsModule,
     WaterLogsModule,
+    AchievementsModule,
+    FitnessScoresModule,
+    NotificationsModule,
+    AiWorkoutModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService],

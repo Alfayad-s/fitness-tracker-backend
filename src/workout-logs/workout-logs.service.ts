@@ -5,6 +5,7 @@ import { WorkoutLog } from '../entities/workout-log.entity';
 import { Workout } from '../entities/workout.entity';
 import { CreateWorkoutLogDto } from './dto/create-workout-log.dto';
 import { UpdateWorkoutLogDto } from './dto/update-workout-log.dto';
+import { AchievementsService } from '../achievements/achievements.service';
 
 @Injectable()
 export class WorkoutLogsService {
@@ -13,6 +14,7 @@ export class WorkoutLogsService {
     private readonly workoutLogsRepository: Repository<WorkoutLog>,
     @InjectRepository(Workout)
     private readonly workoutsRepository: Repository<Workout>,
+    private readonly achievementsService: AchievementsService,
   ) {}
 
   async create(userId: string, dto: CreateWorkoutLogDto): Promise<WorkoutLog> {
@@ -33,7 +35,9 @@ export class WorkoutLogsService {
       notes: dto.notes ?? null,
     });
 
-    return this.workoutLogsRepository.save(workoutLog);
+    const savedLog = await this.workoutLogsRepository.save(workoutLog);
+    await this.achievementsService.checkAndAwardAchievements(userId);
+    return savedLog;
   }
 
   async findAll(userId: string): Promise<WorkoutLog[]> {
