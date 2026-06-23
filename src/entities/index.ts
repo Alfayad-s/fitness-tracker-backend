@@ -3,6 +3,7 @@ export { RefreshToken } from './refresh-token.entity';
 export { WorkoutCategory } from './workout-category.entity';
 export { Workout } from './workout.entity';
 export { WorkoutExercise } from './workout-exercise.entity';
+export { Exercise } from './exercise.entity';
 export { WorkoutLog } from './workout-log.entity';
 export { Goal } from './goal.entity';
 export { WeightLog } from './weight-log.entity';
@@ -24,6 +25,7 @@ import { RefreshToken } from './refresh-token.entity';
 import { WorkoutCategory } from './workout-category.entity';
 import { Workout } from './workout.entity';
 import { WorkoutExercise } from './workout-exercise.entity';
+import { Exercise } from './exercise.entity';
 import { WorkoutLog } from './workout-log.entity';
 import { Goal } from './goal.entity';
 import { WeightLog } from './weight-log.entity';
@@ -46,6 +48,7 @@ export const entities = [
   WorkoutCategory,
   Workout,
   WorkoutExercise,
+  Exercise,
   WorkoutLog,
   Goal,
   WeightLog,

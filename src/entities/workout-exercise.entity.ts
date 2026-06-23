@@ -7,6 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Workout } from './workout.entity';
+import { Exercise } from './exercise.entity';
 
 @Entity('workout_exercises')
 export class WorkoutExercise {
@@ -16,8 +17,8 @@ export class WorkoutExercise {
   @Column({ name: 'workout_id', type: 'uuid' })
   workoutId: string;
 
-  @Column({ name: 'exercise_name', type: 'varchar' })
-  exerciseName: string;
+  @Column({ name: 'exercise_id', type: 'uuid' })
+  exerciseId: string;
 
   @Column({ type: 'int', nullable: true })
   sets: number | null;
@@ -36,4 +37,10 @@ export class WorkoutExercise {
   })
   @JoinColumn({ name: 'workout_id' })
   workout: Workout;
+
+  @ManyToOne(() => Exercise, (exercise) => exercise.workoutExercises, {
+    onDelete: 'RESTRICT',
+  })
+  @JoinColumn({ name: 'exercise_id' })
+  exercise: Exercise;
 }

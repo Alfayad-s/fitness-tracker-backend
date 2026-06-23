@@ -14,6 +14,12 @@ import { ProfileModule } from './profile/profile.module';
 import { RedisModule } from './redis/redis.module';
 import { GoalsModule } from './goals/goals.module';
 import { WeightLogsModule } from './weight-logs/weight-logs.module';
+import { WorkoutCategoriesModule } from './workout-categories/workout-categories.module';
+import { ExercisesModule } from './exercises/exercises.module';
+import { WorkoutsModule } from './workouts/workouts.module';
+import { WorkoutLogsModule } from './workout-logs/workout-logs.module';
+import { MealsModule } from './meals/meals.module';
+import { WaterLogsModule } from './water-logs/water-logs.module';
 
 @Module({
   imports: [
@@ -27,6 +33,12 @@ import { WeightLogsModule } from './weight-logs/weight-logs.module';
     ProfileModule,
     GoalsModule,
     WeightLogsModule,
+    WorkoutCategoriesModule,
+    ExercisesModule,
+    WorkoutsModule,
+    WorkoutLogsModule,
+    MealsModule,
+    WaterLogsModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService],
