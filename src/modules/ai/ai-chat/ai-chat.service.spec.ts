@@ -6,7 +6,10 @@ import { AiChatService } from './ai-chat.service';
 import { AiChatHistory } from '../../../database/schemas/ai-chat-history.entity';
 import { User } from '../../../database/schemas/user.entity';
 import { AskQuestionDto } from './dto/ask-question.dto';
-import { NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import {
+  NotFoundException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 
 // Mock the @google/generative-ai module
 const mockGenerateContent = jest.fn();
@@ -100,7 +103,8 @@ describe('AiChatService', () => {
       ]);
       mockGenerateContent.mockResolvedValue({
         response: {
-          text: () => 'You should do cardio after weights to preserve strength.',
+          text: () =>
+            'You should do cardio after weights to preserve strength.',
         },
       });
 
@@ -117,13 +121,19 @@ describe('AiChatService', () => {
 
       const result = await service.ask('user-uuid', dto);
 
-      expect(mockUserRepository.findOne).toHaveBeenCalledWith({ where: { id: 'user-uuid' } });
+      expect(mockUserRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 'user-uuid' },
+      });
       expect(mockGenerateContent).toHaveBeenCalled();
-      expect(mockAiChatHistoryRepository.create).toHaveBeenCalledWith(expect.objectContaining({
-        userId: 'user-uuid',
-        question: dto.question,
-      }));
-      expect(result.answer).toBe('You should do cardio after weights to preserve strength.');
+      expect(mockAiChatHistoryRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId: 'user-uuid',
+          question: dto.question,
+        }),
+      );
+      expect(result.answer).toBe(
+        'You should do cardio after weights to preserve strength.',
+      );
     });
 
     it('should throw NotFoundException if user is not found', async () => {
@@ -141,7 +151,9 @@ describe('AiChatService', () => {
 
       mockUserRepository.findOne.mockResolvedValue(mockUser);
       mockAiChatHistoryRepository.find.mockResolvedValue([]);
-      mockGenerateContent.mockRejectedValue(new Error('API quota limit exceeded'));
+      mockGenerateContent.mockRejectedValue(
+        new Error('API quota limit exceeded'),
+      );
 
       const mockFetch = jest.spyOn(global, 'fetch').mockImplementation(() =>
         Promise.resolve({
@@ -180,7 +192,9 @@ describe('AiChatService', () => {
     it('should throw InternalServerErrorException if both Gemini and Groq calls fail', async () => {
       mockUserRepository.findOne.mockResolvedValue(mockUser);
       mockAiChatHistoryRepository.find.mockResolvedValue([]);
-      mockGenerateContent.mockRejectedValue(new Error('API quota limit exceeded'));
+      mockGenerateContent.mockRejectedValue(
+        new Error('API quota limit exceeded'),
+      );
 
       const mockFetch = jest.spyOn(global, 'fetch').mockImplementation(() =>
         Promise.resolve({
@@ -200,9 +214,7 @@ describe('AiChatService', () => {
 
   describe('getHistory', () => {
     it('should return plan history', async () => {
-      const mockHistory = [
-        { id: '1', question: 'Q1', answer: 'A1' },
-      ];
+      const mockHistory = [{ id: '1', question: 'Q1', answer: 'A1' }];
       mockAiChatHistoryRepository.find.mockResolvedValue(mockHistory);
 
       const result = await service.getHistory('user-uuid');

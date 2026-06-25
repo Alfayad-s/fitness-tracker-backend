@@ -1,8 +1,8 @@
 import {
-  IsEmail,
   IsInt,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
   Max,
   Min,
@@ -43,5 +43,6 @@ export class OnboardingDto {
 
   @IsString()
   @MinLength(8)
-  password: string;
+  @IsOptional()
+  password?: string;
 }

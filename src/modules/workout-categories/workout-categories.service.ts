@@ -36,7 +36,10 @@ export class WorkoutCategoriesService {
     return category;
   }
 
-  async update(id: string, dto: UpdateWorkoutCategoryDto): Promise<WorkoutCategory> {
+  async update(
+    id: string,
+    dto: UpdateWorkoutCategoryDto,
+  ): Promise<WorkoutCategory> {
     const category = await this.findOne(id);
 
     if (dto.name !== undefined) category.name = dto.name;

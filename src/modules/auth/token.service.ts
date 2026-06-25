@@ -152,7 +152,8 @@ export class TokenService {
   }
 
   sanitizeUser(user: User) {
-    const { password: _, ...safeUser } = user;
+    const { password, ...safeUser } = user;
+    void password;
     return safeUser;
   }
 }

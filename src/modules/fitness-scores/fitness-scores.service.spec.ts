@@ -85,7 +85,9 @@ describe('FitnessScoresService', () => {
       ]);
 
       // 2. Streak: 7 days
-      mockAchievementsService.calculateStreak.mockResolvedValue({ currentStreak: 7 });
+      mockAchievementsService.calculateStreak.mockResolvedValue({
+        currentStreak: 7,
+      });
 
       // 3. Water: Average >= 2000 ml (e.g. 14,000 ml total / 7)
       mockWaterLogRepository.find.mockResolvedValue([
@@ -105,7 +107,9 @@ describe('FitnessScoresService', () => {
       ]);
 
       mockFitnessScoreRepository.create.mockImplementation((dto) => dto);
-      mockFitnessScoreRepository.save.mockImplementation((x) => Promise.resolve({ id: 'score-uuid', ...x }));
+      mockFitnessScoreRepository.save.mockImplementation((x) =>
+        Promise.resolve({ id: 'score-uuid', ...x }),
+      );
 
       const result = await service.calculateAndSaveScore(userId);
 
@@ -126,7 +130,9 @@ describe('FitnessScoresService', () => {
       ]);
 
       // 2. Streak: 3 days (10 points)
-      mockAchievementsService.calculateStreak.mockResolvedValue({ currentStreak: 3 });
+      mockAchievementsService.calculateStreak.mockResolvedValue({
+        currentStreak: 3,
+      });
 
       // 3. Water: Average 1000 ml (7,000 ml total / 7) (10 points)
       mockWaterLogRepository.find.mockResolvedValue([
@@ -143,7 +149,9 @@ describe('FitnessScoresService', () => {
       ]);
 
       mockFitnessScoreRepository.create.mockImplementation((dto) => dto);
-      mockFitnessScoreRepository.save.mockImplementation((x) => Promise.resolve({ id: 'score-uuid', ...x }));
+      mockFitnessScoreRepository.save.mockImplementation((x) =>
+        Promise.resolve({ id: 'score-uuid', ...x }),
+      );
 
       const result = await service.calculateAndSaveScore(userId);
 
@@ -153,12 +161,16 @@ describe('FitnessScoresService', () => {
     it('should compute 0 score if no logs are present', async () => {
       const userId = 'user-uuid';
       mockWorkoutLogRepository.find.mockResolvedValue([]);
-      mockAchievementsService.calculateStreak.mockResolvedValue({ currentStreak: 0 });
+      mockAchievementsService.calculateStreak.mockResolvedValue({
+        currentStreak: 0,
+      });
       mockWaterLogRepository.find.mockResolvedValue([]);
       mockMealRepository.find.mockResolvedValue([]);
 
       mockFitnessScoreRepository.create.mockImplementation((dto) => dto);
-      mockFitnessScoreRepository.save.mockImplementation((x) => Promise.resolve({ id: 'score-uuid', ...x }));
+      mockFitnessScoreRepository.save.mockImplementation((x) =>
+        Promise.resolve({ id: 'score-uuid', ...x }),
+      );
 
       const result = await service.calculateAndSaveScore(userId);
 
@@ -185,7 +197,10 @@ describe('FitnessScoresService', () => {
   describe('getScoreHistory', () => {
     it('should return score calculations descending', async () => {
       const userId = 'user-uuid';
-      const mockRecords = [{ id: '1', score: 85 }, { id: '2', score: 70 }];
+      const mockRecords = [
+        { id: '1', score: 85 },
+        { id: '2', score: 70 },
+      ];
       mockFitnessScoreRepository.find.mockResolvedValue(mockRecords);
 
       const result = await service.getScoreHistory(userId);

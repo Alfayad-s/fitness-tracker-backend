@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
@@ -204,7 +208,10 @@ You MUST format your output strictly as a JSON object matching this schema:
       throw new Error('Groq keys are not configured');
     }
 
-    const keys = groqKeysStr.split(',').map((key) => key.trim()).filter(Boolean);
+    const keys = groqKeysStr
+      .split(',')
+      .map((key) => key.trim())
+      .filter(Boolean);
     if (keys.length === 0) {
       throw new Error('No valid Groq API keys found');
     }
@@ -214,29 +221,34 @@ You MUST format your output strictly as a JSON object matching this schema:
 
     for (const key of keys) {
       try {
-        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${key}`,
-            'Content-Type': 'application/json',
+        const response = await fetch(
+          'https://api.groq.com/openai/v1/chat/completions',
+          {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${key}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              model: 'llama-3.3-70b-versatile',
+              messages: [
+                { role: 'system', content: systemInstruction },
+                { role: 'user', content: prompt },
+              ],
+              response_format: { type: 'json_object' },
+              temperature: 0.7,
+            }),
           },
-          body: JSON.stringify({
-            model: 'llama-3.3-70b-versatile',
-            messages: [
-              { role: 'system', content: systemInstruction },
-              { role: 'user', content: prompt },
-            ],
-            response_format: { type: 'json_object' },
-            temperature: 0.7,
-          }),
-        });
+        );
 
         if (!response.ok) {
           const errText = await response.text();
-          throw new Error(`Groq API returned status ${response.status}: ${errText}`);
+          throw new Error(
+            `Groq API returned status ${response.status}: ${errText}`,
+          );
         }
 
-        const data = await response.json() as any;
+        const data = await response.json();
         const textPlan = data.choices[0].message.content;
         const parsedPlan = JSON.parse(textPlan);
 

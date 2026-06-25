@@ -52,9 +52,12 @@ export class MealsService {
     if (dto.mealType !== undefined) meal.mealType = dto.mealType;
     if (dto.title !== undefined) meal.title = dto.title;
     if (dto.calories !== undefined) meal.calories = dto.calories;
-    if (dto.protein !== undefined) meal.protein = dto.protein !== null ? dto.protein.toString() : null;
-    if (dto.carbs !== undefined) meal.carbs = dto.carbs !== null ? dto.carbs.toString() : null;
-    if (dto.fat !== undefined) meal.fat = dto.fat !== null ? dto.fat.toString() : null;
+    if (dto.protein !== undefined)
+      meal.protein = dto.protein !== null ? dto.protein.toString() : null;
+    if (dto.carbs !== undefined)
+      meal.carbs = dto.carbs !== null ? dto.carbs.toString() : null;
+    if (dto.fat !== undefined)
+      meal.fat = dto.fat !== null ? dto.fat.toString() : null;
     if (dto.mealDate !== undefined) meal.mealDate = dto.mealDate;
 
     return this.mealsRepository.save(meal);

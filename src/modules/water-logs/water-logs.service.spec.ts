@@ -103,8 +103,18 @@ describe('WaterLogsService', () => {
     it('should return all water logs for a user ordered by loggedAt descending', async () => {
       const userId = 'user-uuid';
       const mockLogs = [
-        { id: '1', userId, amountMl: 250, loggedAt: new Date('2026-06-23T12:00:00Z') },
-        { id: '2', userId, amountMl: 500, loggedAt: new Date('2026-06-23T08:00:00Z') },
+        {
+          id: '1',
+          userId,
+          amountMl: 250,
+          loggedAt: new Date('2026-06-23T12:00:00Z'),
+        },
+        {
+          id: '2',
+          userId,
+          amountMl: 500,
+          loggedAt: new Date('2026-06-23T08:00:00Z'),
+        },
       ];
 
       mockWaterLogRepository.find.mockResolvedValue(mockLogs);

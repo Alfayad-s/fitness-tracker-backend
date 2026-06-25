@@ -131,27 +131,48 @@ describe('AchievementsService', () => {
 
   describe('checkAndAwardAchievements', () => {
     const mockAchievements = [
-      { id: 'a0000000-0000-0000-0000-000000000001', title: 'First Steps', description: 'Log your first workout.' },
-      { id: 'a0000000-0000-0000-0000-000000000002', title: 'Consistency Champion', description: 'Reach a 3-day workout streak.' },
-      { id: 'a0000000-0000-0000-0000-000000000005', title: 'Early Bird', description: 'Log a workout before 8:00 AM.' },
+      {
+        id: 'a0000000-0000-0000-0000-000000000001',
+        title: 'First Steps',
+        description: 'Log your first workout.',
+      },
+      {
+        id: 'a0000000-0000-0000-0000-000000000002',
+        title: 'Consistency Champion',
+        description: 'Reach a 3-day workout streak.',
+      },
+      {
+        id: 'a0000000-0000-0000-0000-000000000005',
+        title: 'Early Bird',
+        description: 'Log a workout before 8:00 AM.',
+      },
     ];
 
     it('should award "First Steps" when first workout is logged', async () => {
       mockUserAchievementRepository.find.mockResolvedValue([]);
       mockAchievementRepository.find.mockResolvedValue(mockAchievements);
       mockWorkoutLogRepository.count.mockResolvedValue(1);
-      
+
       // Empty workouts for streak calculation
-      mockWorkoutLogRepository.find.mockResolvedValue([{ workoutDate: '2026-06-23', createdAt: new Date('2026-06-23T10:00:00Z') }]);
+      mockWorkoutLogRepository.find.mockResolvedValue([
+        {
+          workoutDate: '2026-06-23',
+          createdAt: new Date('2026-06-23T10:00:00Z'),
+        },
+      ]);
 
       mockUserAchievementRepository.create.mockImplementation((dto) => dto);
-      mockUserAchievementRepository.save.mockImplementation((x) => Promise.resolve({ id: 'ua-1', ...x }));
+      mockUserAchievementRepository.save.mockImplementation((x) =>
+        Promise.resolve({ id: 'ua-1', ...x }),
+      );
       mockNotificationsService.create.mockResolvedValue(null);
 
       const result = await service.checkAndAwardAchievements('user-uuid');
 
       expect(result).toHaveLength(1);
-      expect(result[0].achievementId).toBe('a0000000-0000-0000-0000-000000000001');
+      expect(result[0].achievementId).toBe(
+        'a0000000-0000-0000-0000-000000000001',
+      );
       expect(mockNotificationsService.create).toHaveBeenCalledWith(
         'user-uuid',
         'Achievement Unlocked: First Steps!',
@@ -173,12 +194,18 @@ describe('AchievementsService', () => {
       ]);
 
       mockUserAchievementRepository.create.mockImplementation((dto) => dto);
-      mockUserAchievementRepository.save.mockImplementation((x) => Promise.resolve({ id: 'ua-2', ...x }));
+      mockUserAchievementRepository.save.mockImplementation((x) =>
+        Promise.resolve({ id: 'ua-2', ...x }),
+      );
 
       const result = await service.checkAndAwardAchievements('user-uuid');
 
       // Should unlock "First Steps" and "Early Bird"
-      expect(result.some(r => r.achievementId === 'a0000000-0000-0000-0000-000000000005')).toBe(true);
+      expect(
+        result.some(
+          (r) => r.achievementId === 'a0000000-0000-0000-0000-000000000005',
+        ),
+      ).toBe(true);
     });
 
     it('should not award achievements that are already earned', async () => {
@@ -188,7 +215,12 @@ describe('AchievementsService', () => {
       ]);
       mockAchievementRepository.find.mockResolvedValue(mockAchievements);
       mockWorkoutLogRepository.count.mockResolvedValue(1);
-      mockWorkoutLogRepository.find.mockResolvedValue([{ workoutDate: '2026-06-23', createdAt: new Date('2026-06-23T10:00:00Z') }]);
+      mockWorkoutLogRepository.find.mockResolvedValue([
+        {
+          workoutDate: '2026-06-23',
+          createdAt: new Date('2026-06-23T10:00:00Z'),
+        },
+      ]);
 
       const result = await service.checkAndAwardAchievements('user-uuid');
 

@@ -6,7 +6,10 @@ import { AiNutritionService } from './ai-nutrition.service';
 import { AiNutritionPlan } from '../../../database/schemas/ai-nutrition-plan.entity';
 import { User } from '../../../database/schemas/user.entity';
 import { GenerateNutritionDto } from './dto/generate-nutrition.dto';
-import { NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import {
+  NotFoundException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 
 // Mock the @google/generative-ai module
 const mockGenerateContent = jest.fn();
@@ -125,20 +128,24 @@ describe('AiNutritionService', () => {
 
       const result = await service.generatePlan('user-uuid', dto);
 
-      expect(mockUserRepository.findOne).toHaveBeenCalledWith({ where: { id: 'user-uuid' } });
+      expect(mockUserRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 'user-uuid' },
+      });
       expect(mockGenerateContent).toHaveBeenCalled();
-      expect(mockAiNutritionPlanRepository.create).toHaveBeenCalledWith(expect.objectContaining({
-        userId: 'user-uuid',
-      }));
+      expect(mockAiNutritionPlanRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId: 'user-uuid',
+        }),
+      );
       expect(result.generatedPlan).toEqual(mockPlanJson);
     });
 
     it('should throw NotFoundException if user is not found', async () => {
       mockUserRepository.findOne.mockResolvedValue(null);
 
-      await expect(
-        service.generatePlan('invalid-user', {}),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.generatePlan('invalid-user', {})).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should fall back to Groq if Gemini fails', async () => {
@@ -148,7 +155,9 @@ describe('AiNutritionService', () => {
       };
 
       mockUserRepository.findOne.mockResolvedValue(mockUser);
-      mockGenerateContent.mockRejectedValue(new Error('API quota limit exceeded'));
+      mockGenerateContent.mockRejectedValue(
+        new Error('API quota limit exceeded'),
+      );
 
       const mockFetch = jest.spyOn(global, 'fetch').mockImplementation(() =>
         Promise.resolve({
@@ -186,7 +195,9 @@ describe('AiNutritionService', () => {
 
     it('should throw InternalServerErrorException if both Gemini and Groq calls fail', async () => {
       mockUserRepository.findOne.mockResolvedValue(mockUser);
-      mockGenerateContent.mockRejectedValue(new Error('API quota limit exceeded'));
+      mockGenerateContent.mockRejectedValue(
+        new Error('API quota limit exceeded'),
+      );
 
       const mockFetch = jest.spyOn(global, 'fetch').mockImplementation(() =>
         Promise.resolve({
@@ -196,9 +207,9 @@ describe('AiNutritionService', () => {
         } as any),
       );
 
-      await expect(
-        service.generatePlan('user-uuid', {}),
-      ).rejects.toThrow(InternalServerErrorException);
+      await expect(service.generatePlan('user-uuid', {})).rejects.toThrow(
+        InternalServerErrorException,
+      );
 
       mockFetch.mockRestore();
     });

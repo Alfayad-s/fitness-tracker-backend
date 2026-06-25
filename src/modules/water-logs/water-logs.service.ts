@@ -41,7 +41,11 @@ export class WaterLogsService {
     return log;
   }
 
-  async update(userId: string, id: string, dto: UpdateWaterLogDto): Promise<WaterLog> {
+  async update(
+    userId: string,
+    id: string,
+    dto: UpdateWaterLogDto,
+  ): Promise<WaterLog> {
     const log = await this.findOne(userId, id);
 
     if (dto.amountMl !== undefined) log.amountMl = dto.amountMl;

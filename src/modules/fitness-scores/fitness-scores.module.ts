@@ -10,12 +10,7 @@ import { FitnessScoresService } from './fitness-scores.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      FitnessScore,
-      WorkoutLog,
-      WaterLog,
-      Meal,
-    ]),
+    TypeOrmModule.forFeature([FitnessScore, WorkoutLog, WaterLog, Meal]),
     AchievementsModule,
   ],
   controllers: [FitnessScoresController],

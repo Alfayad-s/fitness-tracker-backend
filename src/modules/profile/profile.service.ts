@@ -57,7 +57,9 @@ export class ProfileService {
       file,
     );
 
-    await this.usersRepository.update(user.id, { profileImage: profileImageUrl });
+    await this.usersRepository.update(user.id, {
+      profileImage: profileImageUrl,
+    });
 
     const updatedUser = await this.usersRepository.findOne({
       where: { id: user.id },

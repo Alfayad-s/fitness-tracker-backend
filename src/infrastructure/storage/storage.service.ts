@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { randomUUID } from 'crypto';
@@ -30,7 +26,9 @@ export class StorageService {
     }
 
     const url = this.configService.get<string>('storage.supabaseUrl');
-    const key = this.configService.get<string>('storage.supabaseServiceRoleKey');
+    const key = this.configService.get<string>(
+      'storage.supabaseServiceRoleKey',
+    );
 
     if (!url || !key) {
       throw new BadRequestException('File storage is not configured');

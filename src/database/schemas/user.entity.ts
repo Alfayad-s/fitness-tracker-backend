@@ -69,6 +69,9 @@ export class User {
   @Column({ name: 'is_blocked', type: 'boolean', default: false })
   isBlocked: boolean;
 
+  @Column({ name: 'google_id', type: 'varchar', unique: true, nullable: true })
+  googleId: string | null;
+
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
 

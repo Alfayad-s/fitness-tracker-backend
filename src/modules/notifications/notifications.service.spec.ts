@@ -29,7 +29,9 @@ describe('NotificationsService', () => {
     }).compile();
 
     service = module.get<NotificationsService>(NotificationsService);
-    repository = module.get<Repository<Notification>>(getRepositoryToken(Notification));
+    repository = module.get<Repository<Notification>>(
+      getRepositoryToken(Notification),
+    );
   });
 
   afterEach(() => {
@@ -69,7 +71,9 @@ describe('NotificationsService', () => {
         type,
         isRead: false,
       });
-      expect(mockNotificationRepository.save).toHaveBeenCalledWith(mockSavedNotification);
+      expect(mockNotificationRepository.save).toHaveBeenCalledWith(
+        mockSavedNotification,
+      );
       expect(result).toEqual(mockSavedNotification);
     });
 
@@ -77,8 +81,16 @@ describe('NotificationsService', () => {
       const userId = 'user-uuid';
       const title = 'Simple Alert';
 
-      mockNotificationRepository.create.mockReturnValue({ title, message: null, type: null });
-      mockNotificationRepository.save.mockResolvedValue({ title, message: null, type: null });
+      mockNotificationRepository.create.mockReturnValue({
+        title,
+        message: null,
+        type: null,
+      });
+      mockNotificationRepository.save.mockResolvedValue({
+        title,
+        message: null,
+        type: null,
+      });
 
       await service.create(userId, title);
 
@@ -144,15 +156,24 @@ describe('NotificationsService', () => {
     it('should set isRead to true and save', async () => {
       const userId = 'user-uuid';
       const notifId = 'notif-uuid';
-      const existingNotif = { id: notifId, userId, title: 'Notif', isRead: false };
+      const existingNotif = {
+        id: notifId,
+        userId,
+        title: 'Notif',
+        isRead: false,
+      };
 
       mockNotificationRepository.findOne.mockResolvedValue(existingNotif);
-      mockNotificationRepository.save.mockImplementation((x) => Promise.resolve(x));
+      mockNotificationRepository.save.mockImplementation((x) =>
+        Promise.resolve(x),
+      );
 
       const result = await service.markAsRead(userId, notifId);
 
       expect(result.isRead).toBe(true);
-      expect(mockNotificationRepository.save).toHaveBeenCalledWith(existingNotif);
+      expect(mockNotificationRepository.save).toHaveBeenCalledWith(
+        existingNotif,
+      );
     });
   });
 

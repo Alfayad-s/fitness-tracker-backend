@@ -46,8 +46,10 @@ export class GoalsService {
   async update(userId: string, id: string, dto: UpdateGoalDto): Promise<Goal> {
     const goal = await this.findOne(userId, id);
 
-    if (dto.targetValue !== undefined) goal.targetValue = dto.targetValue.toString();
-    if (dto.currentValue !== undefined) goal.currentValue = dto.currentValue.toString();
+    if (dto.targetValue !== undefined)
+      goal.targetValue = dto.targetValue.toString();
+    if (dto.currentValue !== undefined)
+      goal.currentValue = dto.currentValue.toString();
     if (dto.startDate !== undefined) goal.startDate = dto.startDate;
     if (dto.targetDate !== undefined) goal.targetDate = dto.targetDate;
     if (dto.status !== undefined) goal.status = dto.status;
@@ -61,4 +63,4 @@ export class GoalsService {
     return { message: 'Goal deleted successfully' };
   }
 }
-// 
+//

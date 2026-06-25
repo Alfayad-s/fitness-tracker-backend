@@ -1,11 +1,14 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
+import { OAuth2Client } from 'google-auth-library';
 import { User } from '../../database/schemas/user.entity';
 import { MailService } from '../../infrastructure/mail/mail.service';
 import { OnboardingDto } from './dto/onboarding.dto';
@@ -14,19 +17,23 @@ import { TokenService } from './token.service';
 
 @Injectable()
 export class AuthService {
+  private readonly googleClient = new OAuth2Client();
+
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
     private readonly otpService: OtpService,
     private readonly mailService: MailService,
     private readonly tokenService: TokenService,
+    private readonly configService: ConfigService,
   ) {}
 
   private isProfileComplete(user: User): boolean {
+    const hasPasswordOrGoogle = !!user.password || !!user.googleId;
     return !!(
       user.firstName &&
       user.lastName &&
-      user.password &&
+      hasPasswordOrGoogle &&
       user.fitnessGoal
     );
   }
@@ -51,7 +58,9 @@ export class AuthService {
     }
 
     const purpose =
-      existingUser && this.isProfileComplete(existingUser) ? 'login' : 'register';
+      existingUser && this.isProfileComplete(existingUser)
+        ? 'login'
+        : 'register';
     const otp = this.otpService.generateOtp();
 
     await this.otpService.storeOtp(normalizedEmail, purpose, otp);
@@ -134,7 +143,12 @@ export class AuthService {
       throw new ConflictException('An account with this email already exists');
     }
 
-    const hashedPassword = await bcrypt.hash(dto.password, 12);
+    let hashedPassword = existingUser?.password || null;
+    if (dto.password) {
+      hashedPassword = await bcrypt.hash(dto.password, 12);
+    } else if (!existingUser?.googleId) {
+      throw new BadRequestException('Password is required');
+    }
 
     if (existingUser) {
       const user = await this.usersRepository.save({
@@ -219,11 +233,7 @@ export class AuthService {
     };
   }
 
-  async resetPassword(
-    tokenEmail: string,
-    email: string,
-    password: string,
-  ) {
+  async resetPassword(tokenEmail: string, email: string, password: string) {
     const normalizedEmail = email.toLowerCase().trim();
 
     if (tokenEmail !== normalizedEmail) {
@@ -251,5 +261,110 @@ export class AuthService {
       message:
         'Password reset successfully. You have been logged out from all devices.',
     };
+  }
+
+  async validateGoogleUser(profile: {
+    googleId: string;
+    email: string;
+    firstName: string | null;
+    lastName: string | null;
+    picture: string | null;
+  }) {
+    const normalizedEmail = profile.email.toLowerCase().trim();
+    let user = await this.usersRepository.findOne({
+      where: { googleId: profile.googleId },
+    });
+
+    if (!user) {
+      user = await this.usersRepository.findOne({
+        where: { email: normalizedEmail },
+      });
+
+      if (user) {
+        user.googleId = profile.googleId;
+        if (!user.isVerified) {
+          user.isVerified = true;
+        }
+        if (!user.firstName) user.firstName = profile.firstName;
+        if (!user.lastName) user.lastName = profile.lastName;
+        if (!user.profileImage) user.profileImage = profile.picture;
+
+        user = await this.usersRepository.save(user);
+      } else {
+        user = await this.usersRepository.save(
+          this.usersRepository.create({
+            email: normalizedEmail,
+            googleId: profile.googleId,
+            firstName: profile.firstName,
+            lastName: profile.lastName,
+            profileImage: profile.picture,
+            isVerified: true,
+            isBlocked: false,
+          }),
+        );
+      }
+    } else {
+      let updated = false;
+      if (!user.firstName && profile.firstName) {
+        user.firstName = profile.firstName;
+        updated = true;
+      }
+      if (!user.lastName && profile.lastName) {
+        user.lastName = profile.lastName;
+        updated = true;
+      }
+      if (!user.profileImage && profile.picture) {
+        user.profileImage = profile.picture;
+        updated = true;
+      }
+      if (updated) {
+        user = await this.usersRepository.save(user);
+      }
+    }
+
+    if (user.isBlocked) {
+      throw new UnauthorizedException('This account has been blocked');
+    }
+
+    if (this.isProfileComplete(user)) {
+      const tokens = await this.tokenService.issueAuthTokens(user);
+      return {
+        type: 'login' as const,
+        ...tokens,
+        user: this.tokenService.sanitizeUser(user),
+      };
+    }
+
+    const registrationToken =
+      this.tokenService.createRegistrationToken(normalizedEmail);
+    return {
+      type: 'register' as const,
+      registrationToken,
+      message:
+        'Google login successful. Complete your profile to finish registration.',
+    };
+  }
+
+  async authenticateGoogleToken(idToken: string) {
+    try {
+      const ticket = await this.googleClient.verifyIdToken({
+        idToken,
+        audience: this.configService.get<string>('auth.googleClientId'),
+      });
+      const payload = ticket.getPayload();
+      if (!payload || !payload.email || !payload.sub) {
+        throw new UnauthorizedException('Invalid Google ID token payload');
+      }
+
+      return this.validateGoogleUser({
+        googleId: payload.sub,
+        email: payload.email,
+        firstName: payload.given_name || null,
+        lastName: payload.family_name || null,
+        picture: payload.picture || null,
+      });
+    } catch {
+      throw new UnauthorizedException('Invalid Google ID token');
+    }
   }
 }

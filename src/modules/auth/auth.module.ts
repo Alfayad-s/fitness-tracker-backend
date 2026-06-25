@@ -12,8 +12,10 @@ import { AuthService } from './auth.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RegistrationTokenGuard } from '../../common/guards/registration-token.guard';
 import { ResetPasswordTokenGuard } from '../../common/guards/reset-password-token.guard';
+import { GoogleAuthGuard } from '../../common/guards/google-auth.guard';
 import { OtpService } from './otp.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { GoogleStrategy } from './strategies/google.strategy';
 import { TokenService } from './token.service';
 
 @Module({
@@ -36,10 +38,12 @@ import { TokenService } from './token.service';
     OtpService,
     TokenService,
     JwtStrategy,
+    GoogleStrategy,
     JwtAuthGuard,
+    GoogleAuthGuard,
     RegistrationTokenGuard,
     ResetPasswordTokenGuard,
   ],
-  exports: [AuthService, TokenService, JwtAuthGuard],
+  exports: [AuthService, TokenService, JwtAuthGuard, GoogleAuthGuard],
 })
 export class AuthModule {}

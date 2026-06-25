@@ -27,7 +27,9 @@ export class ResetPasswordTokenGuard implements CanActivate {
         payload.email;
       return true;
     } catch {
-      throw new UnauthorizedException('Invalid or expired reset password token');
+      throw new UnauthorizedException(
+        'Invalid or expired reset password token',
+      );
     }
   }
 }

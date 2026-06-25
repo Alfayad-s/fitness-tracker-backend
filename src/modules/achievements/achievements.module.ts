@@ -9,11 +9,7 @@ import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      Achievement,
-      UserAchievement,
-      WorkoutLog,
-    ]),
+    TypeOrmModule.forFeature([Achievement, UserAchievement, WorkoutLog]),
     NotificationsModule,
   ],
   controllers: [AchievementsController],

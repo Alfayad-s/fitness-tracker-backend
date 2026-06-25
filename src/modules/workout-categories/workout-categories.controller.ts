@@ -16,9 +16,7 @@ import { WorkoutCategoriesService } from './workout-categories.service';
 @Controller('workout-categories')
 @UseGuards(JwtAuthGuard)
 export class WorkoutCategoriesController {
-  constructor(
-    private readonly categoriesService: WorkoutCategoriesService,
-  ) {}
+  constructor(private readonly categoriesService: WorkoutCategoriesService) {}
 
   @Post()
   create(@Body() dto: CreateWorkoutCategoryDto) {
@@ -36,10 +34,7 @@ export class WorkoutCategoriesController {
   }
 
   @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() dto: UpdateWorkoutCategoryDto,
-  ) {
+  update(@Param('id') id: string, @Body() dto: UpdateWorkoutCategoryDto) {
     return this.categoriesService.update(id, dto);
   }
 

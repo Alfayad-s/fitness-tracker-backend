@@ -18,7 +18,9 @@ export class AchievementsService {
     private readonly notificationsService: NotificationsService,
   ) {}
 
-  async calculateStreak(userId: string): Promise<{ currentStreak: number; longestStreak: number }> {
+  async calculateStreak(
+    userId: string,
+  ): Promise<{ currentStreak: number; longestStreak: number }> {
     const logs = await this.workoutLogsRepository.find({
       where: { userId },
       select: { workoutDate: true },
@@ -30,10 +32,12 @@ export class AchievementsService {
     }
 
     // Get unique workout dates
-    const uniqueDates = Array.from(new Set(logs.map(log => log.workoutDate))).sort();
+    const uniqueDates = Array.from(
+      new Set(logs.map((log) => log.workoutDate)),
+    ).sort();
 
     // Map date strings to UTC Dates (ignoring local times for strict daily logic)
-    const dates = uniqueDates.map(d => new Date(d));
+    const dates = uniqueDates.map((d) => new Date(d));
 
     let longestStreak = 1;
     let runningStreak = 1;
@@ -68,7 +72,9 @@ export class AchievementsService {
     let currentStreak = 0;
     if (hasWorkedOutToday || hasWorkedOutYesterday) {
       currentStreak = 1;
-      const checkDate = hasWorkedOutToday ? new Date(todayStr) : new Date(yesterdayStr);
+      const checkDate = hasWorkedOutToday
+        ? new Date(todayStr)
+        : new Date(yesterdayStr);
 
       while (true) {
         checkDate.setDate(checkDate.getDate() - 1);
@@ -89,12 +95,14 @@ export class AchievementsService {
       where: { userId },
       select: { achievementId: true },
     });
-    const earnedIds = new Set(earned.map(e => e.achievementId));
+    const earnedIds = new Set(earned.map((e) => e.achievementId));
 
     const allAchievements = await this.achievementsRepository.find();
     const isEarned = (id: string) => earnedIds.has(id);
 
-    const totalWorkouts = await this.workoutLogsRepository.count({ where: { userId } });
+    const totalWorkouts = await this.workoutLogsRepository.count({
+      where: { userId },
+    });
     const { longestStreak } = await this.calculateStreak(userId);
 
     const allLogs = await this.workoutLogsRepository.find({
@@ -102,26 +110,31 @@ export class AchievementsService {
       select: { createdAt: true },
     });
 
-    const hasEarlyBirdWorkout = allLogs.some(log => {
+    const hasEarlyBirdWorkout = allLogs.some((log) => {
       const hours = new Date(log.createdAt).getHours();
       return hours < 8;
     });
 
-    const hasNightOwlWorkout = allLogs.some(log => {
+    const hasNightOwlWorkout = allLogs.some((log) => {
       const hours = new Date(log.createdAt).getHours();
       return hours >= 20;
     });
 
     const newlyAwarded: UserAchievement[] = [];
 
-    const award = async (achievementId: string, title: string, message: string | null) => {
+    const award = async (
+      achievementId: string,
+      title: string,
+      message: string | null,
+    ) => {
       if (isEarned(achievementId)) return;
 
       const userAchievement = this.userAchievementsRepository.create({
         userId,
         achievementId,
       });
-      const savedUA = await this.userAchievementsRepository.save(userAchievement);
+      const savedUA =
+        await this.userAchievementsRepository.save(userAchievement);
       newlyAwarded.push(savedUA);
 
       await this.notificationsService.create(
@@ -133,22 +146,40 @@ export class AchievementsService {
     };
 
     for (const achievement of allAchievements) {
-      if (achievement.id === 'a0000000-0000-0000-0000-000000000001' && totalWorkouts >= 1) {
+      if (
+        achievement.id === 'a0000000-0000-0000-0000-000000000001' &&
+        totalWorkouts >= 1
+      ) {
         await award(achievement.id, achievement.title, achievement.description);
       }
-      if (achievement.id === 'a0000000-0000-0000-0000-000000000002' && longestStreak >= 3) {
+      if (
+        achievement.id === 'a0000000-0000-0000-0000-000000000002' &&
+        longestStreak >= 3
+      ) {
         await award(achievement.id, achievement.title, achievement.description);
       }
-      if (achievement.id === 'a0000000-0000-0000-0000-000000000003' && longestStreak >= 7) {
+      if (
+        achievement.id === 'a0000000-0000-0000-0000-000000000003' &&
+        longestStreak >= 7
+      ) {
         await award(achievement.id, achievement.title, achievement.description);
       }
-      if (achievement.id === 'a0000000-0000-0000-0000-000000000004' && totalWorkouts >= 10) {
+      if (
+        achievement.id === 'a0000000-0000-0000-0000-000000000004' &&
+        totalWorkouts >= 10
+      ) {
         await award(achievement.id, achievement.title, achievement.description);
       }
-      if (achievement.id === 'a0000000-0000-0000-0000-000000000005' && hasEarlyBirdWorkout) {
+      if (
+        achievement.id === 'a0000000-0000-0000-0000-000000000005' &&
+        hasEarlyBirdWorkout
+      ) {
         await award(achievement.id, achievement.title, achievement.description);
       }
-      if (achievement.id === 'a0000000-0000-0000-0000-000000000006' && hasNightOwlWorkout) {
+      if (
+        achievement.id === 'a0000000-0000-0000-0000-000000000006' &&
+        hasNightOwlWorkout
+      ) {
         await award(achievement.id, achievement.title, achievement.description);
       }
     }
@@ -163,9 +194,9 @@ export class AchievementsService {
     const earned = await this.userAchievementsRepository.find({
       where: { userId },
     });
-    const earnedMap = new Map(earned.map(e => [e.achievementId, e.earnedAt]));
+    const earnedMap = new Map(earned.map((e) => [e.achievementId, e.earnedAt]));
 
-    return all.map(achievement => ({
+    return all.map((achievement) => ({
       ...achievement,
       earned: earnedMap.has(achievement.id),
       earnedAt: earnedMap.get(achievement.id) || null,

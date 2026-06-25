@@ -39,7 +39,10 @@ function formatOtp(otp: string): string {
   return otp.length === 6 ? `${otp.slice(0, 3)} ${otp.slice(3)}` : otp;
 }
 
-export function buildOtpEmailText(otp: string, purpose: OtpEmailPurpose): string {
+export function buildOtpEmailText(
+  otp: string,
+  purpose: OtpEmailPurpose,
+): string {
   return contentByPurpose[purpose].text.replace('{otp}', otp);
 }
 

@@ -18,7 +18,11 @@ export class FitnessScore {
   @Column({ type: 'int' })
   score: number;
 
-  @Column({ name: 'calculated_at', type: 'timestamptz', default: () => 'now()' })
+  @Column({
+    name: 'calculated_at',
+    type: 'timestamptz',
+    default: () => 'now()',
+  })
   calculatedAt: Date;
 
   @ManyToOne(() => User, (user) => user.fitnessScores, { onDelete: 'CASCADE' })

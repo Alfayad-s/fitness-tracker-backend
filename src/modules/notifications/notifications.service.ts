@@ -52,7 +52,9 @@ export class NotificationsService {
     return this.notificationsRepository.save(notification);
   }
 
-  async markAllAsRead(userId: string): Promise<{ message: string; count: number }> {
+  async markAllAsRead(
+    userId: string,
+  ): Promise<{ message: string; count: number }> {
     const unread = await this.notificationsRepository.find({
       where: { userId, isRead: false },
     });

@@ -38,7 +38,7 @@ export class WorkoutsService {
 
   private async validateExercisesExist(exerciseIds: string[]): Promise<void> {
     if (exerciseIds.length === 0) return;
-    
+
     const uniqueIds = Array.from(new Set(exerciseIds));
     const foundExercises = await this.exercisesRepository.find({
       where: { id: In(uniqueIds) },

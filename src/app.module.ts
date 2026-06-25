@@ -30,7 +30,14 @@ import { AiWorkoutModule } from './modules/ai/ai-workout/ai-workout.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [databaseConfig, redisConfig, authConfig, mailConfig, storageConfig, aiConfig],
+      load: [
+        databaseConfig,
+        redisConfig,
+        authConfig,
+        mailConfig,
+        storageConfig,
+        aiConfig,
+      ],
     }),
     DatabaseModule,
     RedisModule,

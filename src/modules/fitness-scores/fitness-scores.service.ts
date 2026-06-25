@@ -25,7 +25,7 @@ export class FitnessScoresService {
     const today = new Date();
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(today.getDate() - 7);
-    
+
     const sevenDaysAgoStr = sevenDaysAgo.toISOString().split('T')[0];
 
     // 1. Workouts Points (Max 40)
@@ -36,8 +36,9 @@ export class FitnessScoresService {
       },
       select: { workoutDate: true },
     });
-    
-    const uniqueWorkoutDays = new Set(recentWorkouts.map(w => w.workoutDate)).size;
+
+    const uniqueWorkoutDays = new Set(recentWorkouts.map((w) => w.workoutDate))
+      .size;
     let workoutPoints = 0;
     if (uniqueWorkoutDays >= 4) workoutPoints = 40;
     else if (uniqueWorkoutDays === 3) workoutPoints = 30;
@@ -45,7 +46,8 @@ export class FitnessScoresService {
     else if (uniqueWorkoutDays === 1) workoutPoints = 10;
 
     // 2. Streak Points (Max 20)
-    const { currentStreak } = await this.achievementsService.calculateStreak(userId);
+    const { currentStreak } =
+      await this.achievementsService.calculateStreak(userId);
     let streakPoints = 0;
     if (currentStreak >= 7) streakPoints = 20;
     else if (currentStreak >= 5) streakPoints = 15;
@@ -59,8 +61,11 @@ export class FitnessScoresService {
         loggedAt: MoreThanOrEqual(sevenDaysAgo),
       },
     });
-    
-    const totalWaterMl = recentWater.reduce((sum, log) => sum + log.amountMl, 0);
+
+    const totalWaterMl = recentWater.reduce(
+      (sum, log) => sum + log.amountMl,
+      0,
+    );
     const avgWaterMl = totalWaterMl / 7;
     let hydrationPoints = 0;
     if (avgWaterMl >= 2000) hydrationPoints = 20;
@@ -76,15 +81,16 @@ export class FitnessScoresService {
       },
       select: { mealDate: true },
     });
-    
-    const uniqueMealDays = new Set(recentMeals.map(m => m.mealDate)).size;
+
+    const uniqueMealDays = new Set(recentMeals.map((m) => m.mealDate)).size;
     let nutritionPoints = 0;
     if (uniqueMealDays >= 7) nutritionPoints = 20;
     else if (uniqueMealDays >= 5) nutritionPoints = 15;
     else if (uniqueMealDays >= 3) nutritionPoints = 10;
     else if (uniqueMealDays >= 1) nutritionPoints = 5;
 
-    const totalScore = workoutPoints + streakPoints + hydrationPoints + nutritionPoints;
+    const totalScore =
+      workoutPoints + streakPoints + hydrationPoints + nutritionPoints;
 
     const scoreRecord = this.fitnessScoresRepository.create({
       userId,
